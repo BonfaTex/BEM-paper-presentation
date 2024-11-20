@@ -20,5 +20,4 @@ The past fifty years have been marked by the evolution of computers and an enorm
 
 ___
 
-If you want to find out more about the BEM, you can check the paper [here](main.pdf) ↗️  
-Instead, in the `presentation` folder you'll find the presentation slides.
+If you want to find out more about the BEM, you can check the paper [here](main.pdf). Instead, in the `presentation` folder you'll find the presentation slides.
