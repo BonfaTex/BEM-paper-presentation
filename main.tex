@@ -1,0 +1,115 @@
+%===============================================================================
+% ifacconf.tex 2022-02-11 jpuente  
+% 2022-11-11 jpuente change length of abstract
+% Template for IFAC meeting papers
+% Copyright (c) 2022 International Federation of Automatic Control
+%===============================================================================
+\documentclass[numbers]{ifacconf}
+
+\usepackage{graphicx}      % include this line if your document contains figures
+\graphicspath{ {./figures/} }
+\usepackage{adjustbox} % adjust figures on left or right
+
+\makeatletter
+\let\old@ssect\@ssect % Store how ifacconf defines \@ssect
+\makeatother
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{enumerate}
+
+\usepackage{enumitem}
+
+%---------- References --------------
+\usepackage{hyperref} % Adds clickable links at references
+%\usepackage{cleveref}
+\usepackage[square, numbers, sort&compress]{natbib} % Square brackets, citing references with numbers, citations sorted by appearance in the text and compressed
+\bibliographystyle{abbrvnat} % You may use a different style adapted to your field
+
+\makeatletter
+\def\@ssect#1#2#3#4#5#6{%
+  \NR@gettitle{#6}% Insert key \nameref title grab
+  \old@ssect{#1}{#2}{#3}{#4}{#5}{#6}% Restore ifacconf's \@ssect
+}
+\makeatother
+
+%===============================================================================
+
+\begin{document}
+
+%===============================================================================
+
+\begin{frontmatter}
+
+% \includegraphics[scale=0.4]{logo_polimi}
+
+\title{The Boundary Element Method: Theoretical Formulation, Numerical Approximation, and Parallel Implementation}
+
+Type A project for the \textit{Numerical Analysis for PDEs} course
+
+\author[first]{Matteo Bonfadini\thanksref{ty}}, 
+\author[second]{Manuel Alfano\thanksref{ty}}
+
+\thanks[ty]{We deeply thank for the opportunity Prof. P.F.Antonietti, Dr. F. Regazzoni, Dr. C. B. Leimer Saglio, and for the support Dr. I. Mazzieri.} 
+
+\address[first]{Politecnico di Milano,
+Piazza Leonardo da Vinci 32, 20133 Milano, Italy (e-mail: \normalfont\texttt{matteo.bonfadini@mail.polimi.it})}
+
+\address[second]{Politecnico di Milano,
+Piazza Leonardo da Vinci 32, 20133 Milano, Italy (e-mail: \normalfont\texttt{manuel.alfano@mail.polimi.it})}
+
+\textit{May 23, 2024}
+
+\input{tex/abstract}
+
+\begin{keyword}
+BEM \sep 
+Fundamental solution \sep
+Collocation method \sep
+Fast multipole method \sep
+MPI
+\end{keyword}
+
+\end{frontmatter}
+
+%===============================================================================
+
+\input{tex/01Introduction}
+\input{tex/02BoundaryIntegralFormulation}
+\input{tex/03Discretisation}
+\input{tex/04Results}
+\input{tex/05Parallelisation}
+\input{tex/055Fast}
+\input{tex/06Conclusions}
+
+%================================================================
+
+%\input{ifactext}
+
+%================================================================
+
+\bibliography{ifacconf}
+
+%\section*{References}
+
+\begin{enumerate}[label={[\arabic*]}]
+\item L. C. Evans. \emph{Partial Differential Equations}, volume 19. American Mathematical Society, 1993. \label{Evans}
+\item J. T. Katsikadelis. \emph{The Boundary Element Method for Engineers and Scientist}. Academic Press, 2 edition, 2016. \label{Katsi}
+\item Y. J. Liu, S. Mukherjee, N. Nishimura, M. Schanz, W. Ye and A. Sutradhar and E. Pan and A. Dumont and A. Frangi and A. Saez. \emph{Recent Advances and Emerging Applications of the Boundary Element Method}. Applied Mechanics Reviews, 64, 2011. \label{Attilio}
+\item A. Mola, N. Giuliani, L. Heltai. \emph{$\pi$-\texttt{BEM}: A flexible parallel implementation for adaptive, geometry aware, and high order boundary element methods}. Advances in Engineering Software, 121:39–58, 2018. \label{Mola}
+\item L. Greengard, W. D. Gropp. \emph{A parallel version of the fast multipole method}, volume 20. Computers Math. Applic. 7:63-71, 1990. \label{grop}
+\end{enumerate}
+
+
+
+%================================================================
+
+%\appendix % Each appendix must have a short title.
+
+%\input{tex/A1FundamentalSolution}
+
+
+%================================================================
+
+\end{document}

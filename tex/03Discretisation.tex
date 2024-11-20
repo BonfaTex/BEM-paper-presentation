@@ -1,0 +1,142 @@
+%!TEX root = ../main.tex
+
+\section{Discretisation}
+\label{sec:Discretisation}
+
+We use standard Lagrangian finite element spaces on $\Gamma$ as basis functions both for the geometry and the unknowns $\phi$ and $\frac{\partial\phi}{\partial n}=:\gamma$. The approximation can be divided in 6 main steps.
+
+\subsection{Computational Mesh Generation}
+\label{sub:computational_mesh_generation}
+
+We define a quadrilateral computational mesh meant as a regular\footnote{For every cell $K$ there exist a mapping from a reference cell $\hat{K}$ to $K$ with positive determinant of the Jacobian.} decomposition $\Gamma_h$ of the boundary $\Gamma$. Then we progressively refine this very coarse mesh, by exploiting a proper \emph{a posteriori} error estimator, to obtain a solution with desired accuracy.
+
+\subsection{Definition of the Discrete Spaces}
+\label{sub:definition_of_the_discrete_spaces}
+
+The right spaces to analyse Eq.~\eqref{eq:solid-angle} are
+\begin{equation*}
+\phi\in V=H^{1/2}(\Gamma)\qquad \gamma\in Q=H^{-1/2}(\Gamma)
+\end{equation*}
+
+In a conforming setting we choose $V_h\subseteq V,\ Q_h\subseteq Q$ as
+\begin{subequations}
+\label{eq:FEspaces}
+\begin{align}
+\label{eq:Vhspace}
+V_h&:=\left\{ \phi_h\in L^2(\Gamma_h)\,:\,\phi_h\big|_K\in \mathbb{Q}^r(K),\ K\in\Gamma_h \right\}, \\
+\label{eq:Qhspace} 
+Q_h&:=\left\{ \gamma_h\in L^2(\Gamma_h)\,:\,\gamma_h\big|_K\in \mathbb{Q}^s(K),\ K\in\Gamma_h \right\}.
+\end{align}
+\end{subequations}
+
+
+It can be shown that using the same FE discretization for both unknowns does not lead to big disadvantages, thus
+\begin{equation*}
+V_h=Q_h\equiv \text{span}\{\psi_i\}_{i=1}^{N_V}.
+\end{equation*}
+
+\subsection{Collocation of the BIE}
+\label{sub:collocation_of_the_bie}
+
+Two approaches are possible in order to discretize Eq.~\eqref{eq:characteristic-angle}. The \emph{Galerkin BEM} is a natural choice and it consists in writing the problem in variational form; however, this implies a second integration of weakly singular kernels, which would increase the computational complexity of the BEM. Therefore, we focus on \emph{collocation methods}. The idea is to directly use the discretized $\phi_h$ and $\gamma_h$ instead of the continuous $\phi$ and $\gamma$, and to collocate the BIE on a number of points equal to the number of unknowns, for example on the support of the Lagrangian basis functions.
+
+We collocate Eq.~\eqref{eq:solid-angle}\footnote{It's simpler to impose the boundary conditions after assembling the linear system.} on the nodes $x_i$ of the boundary mesh, obtaining
+\begin{align*}
+\alpha(x_i)\phi(x_i)=&\sum_{K\in\Gamma_h}\int_K \gamma(y)\ G(x_i,y)\ \mathrm{d}S(y)\ + \\
+& - \sum_{K\in\Gamma_h}\int_K \frac{\partial G}{\partial n}(x_i,y)\ \phi(y)\ \mathrm{d}S(y)
+\end{align*}
+for every $i=1,\dots,N_V$. Then by a quadrature formula which exploit the geometry of the boundary instead of using generic quadrature weights we get
+\begin{align*}
+\alpha(x_i)\phi(x_i)=&\sum_{K\in\Gamma_h}\sum_{q=1}^{N_q} \gamma(x_q) G(x_i,x_q) J^K(x_q)\ + \\
+& - \sum_{K\in\Gamma_h}\sum_{q=1}^{N_q} \frac{\partial G}{\partial n}(x_i,x_q) \phi(x_q) J^K(x_q),
+\end{align*}
+
+where $J^K$ is the determinant of the first fundamental form for each reference cell $\hat{K}$. Now, as we anticipated before, we substitute $\phi$ with its approximation, i.e. $\phi(x_q)\approx \phi_h= \sum_j \phi_j \psi_j(x_q)$. We do the same thing for the flux $\frac{\partial\phi}{\partial n}$, and this yields
+\begin{align*}
+\alpha(x_i)\phi_j\psi_j(x_i)=&\sum_{K\in\Gamma_h}\sum_{q=1}^{N_q} \gamma_j \psi_j(x_q) G(x_i,x_q) J^K(x_q)\ + \\
+& - \sum_{K\in\Gamma_h}\sum_{q=1}^{N_q} \frac{\partial G}{\partial n}(x_i,x_q) \phi_j \psi_j(x_q) J^K(x_q),
+\end{align*}
+
+and finally we obtain the linear system
+\begin{equation}
+\label{eq:first-LS}
+(\alpha+N)\hat{\phi}-D\hat{\gamma}=0,
+\end{equation}
+
+where
+\begin{itemize}
+\item $\alpha$ is the diagonal matrix of values $\alpha(x_i)$;
+\item $D_{ij}=\sum_K \sum_q G(x_i,x_q)\psi_j^q J^K$;
+\item $N_{ij}=\sum_K \sum_q \frac{\partial G}{\partial n}(x_i,x_q)\psi_j^q J^K$;
+\item $\hat{\phi}$, $\hat{\gamma}$ are the nodal values of the unknowns.
+\end{itemize}
+
+\subsection{Imposition of the Boundary Conditions}
+\label{sub:imposition_of_the_boundary_conditions}
+
+To impose the boundary condition for $\phi_h$ and $\gamma_h$, we define the additional vectors
+\begin{subequations}
+\label{eq:bc-LS}
+\begin{align}
+\label{eq:bc-LS1}
+\tilde{\phi} &= 
+\begin{cases}
+0 & \text{on } \Gamma_D \\
+\hat{\phi} & \text{on } \Gamma_N
+\end{cases} \qquad &&
+\tilde{\gamma} = 
+\begin{cases}
+\hat{\gamma} & \text{on } \Gamma_D \\
+0 & \text{on }  \Gamma_N
+\end{cases} \\
+\label{eq:bc-LS2}
+\bar{\phi} &= 
+\begin{cases}
+f_D & \text{on }  \Gamma_D \\
+0 & \text{on }  \Gamma_N
+\end{cases} \qquad &&
+\bar{\gamma} = 
+\begin{cases}
+0 & \text{on }  \Gamma_D \\
+f_N & \text{on } \Gamma_N
+\end{cases}
+\end{align}
+\end{subequations}
+
+With these defintions we can decouple the action of the two unknowns: while \eqref{eq:bc-LS1} clarify the real unknowns, \eqref{eq:bc-LS2} help setting the known values. The decoupled system is 
+\begin{equation*}
+\begin{cases}
+(\alpha+N)\hat{\phi}-D\hat{\gamma}=0 & \text{on }\Gamma_D \\
+(\alpha+N)\hat{\phi}-D\hat{\gamma}=0 & \text{on }\Gamma_N
+\end{cases}
+\end{equation*}
+therefore
+\begin{equation}
+\label{eq:final-LS-with-underbracket}
+\underbracket[0.5pt]{(\alpha+N)\tilde{\phi}-D\tilde{\gamma}}_{A\tilde{t}}=\underbracket[0.5pt]{-(\alpha+N)\bar{\phi}+D\bar{\gamma}}_{b}.
+\end{equation}
+
+To wrap up, we obtained the linear system $A\tilde{t}=b$, where $\tilde{t}$ simply groups the unknowns:
+\begin{equation*}
+\tilde{t}_i=
+\begin{cases}
+\hat{\gamma}_i &\text{if }x_i\in\Gamma_D \\
+\hat{\phi}_i &\text{if }x_i\in\Gamma_N  
+\end{cases}
+\end{equation*}
+
+Notice that the system in Eq.~\eqref{eq:final-LS-with-underbracket} is \emph{one to one} with Eq.~\eqref{eq:characteristic-angle}, as one would expect.
+
+\subsection{Solution of the Linear System}
+\label{sub:solution_of_the_linear_system}
+
+In order to solve system \eqref{eq:final-LS-with-underbracket}, we don't assemble the matrix $A$ but we use the Generalized Minimal Residuals (GMRES), which is an iterative method based on Krylov subspace methods. By using least squares (and a preconditioner to accelerate the convergence), we minimize the residual $r^{(k)}=b-At^{(k)}$ till desired accuracy. This procedure works well in BEM frameworks, because it allows you to deal with nonsymmetric and fully populated matrices, and without explicitly forming them, saving a lot of memory.
+
+\subsection{Post Process}
+\label{sub:post_process}
+
+We compute an error analysis to verify the proper convergence of the method and if necessary we proceed with a local refinement; then we recover the normal derivative $\frac{\partial \phi}{\partial n}$ (or simply the gradient $\nabla\phi$) by computing the derivative over Eq.~\eqref{eq:solid-angle}, and finally we output the solution.
+
+
+
+
